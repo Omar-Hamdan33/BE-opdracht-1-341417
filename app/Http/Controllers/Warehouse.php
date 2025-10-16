@@ -36,11 +36,28 @@ class Warehouse extends Controller
     }
 
     public function leverancier($id) {
-        $data = $this->warehouseModel->GetLeverancierByProductId($id);
+        $rawData = $this->warehouseModel->GetLeverancierByProductId($id);
+        
+        // Initialize arrays
+        $product = [];
+        $leverancier = [];
+        
+        // Check and sort data based on content
+        if (!empty($rawData)) {
+            foreach ($rawData as $item) {
+                if (isset($item->DatumLevering) ) {
+                    $product[] = $item;
+                }
+                else if (isset($item->LeverancierNummer) ) {
+                    $leverancier[] = $item;
+                }
+            }
+        }
+        
         return view('leverancier.show', [
             'title' => 'leverancier Details',
-            'product' => $data['product'],
-            'leverancier' => $data['leverancier']
+            'product' => $product,
+            'leverancier' => $leverancier
         ]);
     }
 }

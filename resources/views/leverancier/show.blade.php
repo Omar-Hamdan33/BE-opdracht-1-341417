@@ -24,6 +24,7 @@
         </tr>
         </thead>
         <tbody>
+            <?php dd($leverancier); ?>
         @foreach($product as $products)
             <tr>
                 <td>{{ $products->Naam }}</td>

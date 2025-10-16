@@ -17,16 +17,6 @@ class WarehouseModel extends Model
 
     public function GetLeverancierByProductId($id)
     {
-        $connection = DB::connection()->getPdo();
-        $stmt = $connection->prepare('CALL GetLeverancierByProduct(?)');
-        $stmt->execute([$id]);
-        $leverancierInfo = $stmt->fetchAll(\PDO::FETCH_OBJ);
-        $stmt->nextRowset();
-        $productInfo = $stmt->fetchAll(\PDO::FETCH_OBJ);
-        
-        return [
-            'product' => $productInfo,
-            'leverancier' => $leverancierInfo
-        ];
+        return DB::select('CALL GetLeverancierByProduct(?)', [$id]);
     }
 }
