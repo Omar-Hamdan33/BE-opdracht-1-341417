@@ -21,7 +21,7 @@
             </div>
 
             <h2>Product Details</h2>
-            @if(count($product) > 0)
+            @if($hasStock && count($product) > 0)
                 <table class="table">
                     <thead>
                         <tr>
@@ -42,6 +42,19 @@
                         @endforeach
                     </tbody>
                 </table>
+            @elseif(!$hasStock && count($product) > 0)
+                @php
+                    $nextDelivery = collect($product)->where('DatumEerstVolgendeLevering', '!=', null)->first();
+                    $deliveryDate = $nextDelivery ? \Carbon\Carbon::parse($nextDelivery->DatumEerstVolgendeLevering)->format('d-m-Y') : '30-04-2023';
+                @endphp
+                <div class="alert alert-warning" id="no-stock-message">
+                    Er is van dit product op dit moment geen voorraad aanwezig, de verwachte eerstvolgende levering is: {{ $deliveryDate }}
+                </div>
+                <script>
+                    setTimeout(function() {
+                        window.location.href = '/warehouse';
+                    }, 4000);
+                </script>
             @else
                 <div class="alert alert-warning" id="no-stock-message">
                     Er is van dit product op dit moment geen voorraad aanwezig, de verwachte eerstvolgende levering is: 30-04-2023

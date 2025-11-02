@@ -270,7 +270,8 @@ BEGIN
         ppl.DatumEerstVolgendeLevering
     FROM Product p
 	JOIN ProductPerLeverancier ppl ON p.Id = ppl.ProductId
-    WHERE ppl.ProductId = productId;
+    WHERE ppl.ProductId = productId
+    ORDER BY ppl.DatumLevering ASC;
 END$$
 
 DELIMITER ;

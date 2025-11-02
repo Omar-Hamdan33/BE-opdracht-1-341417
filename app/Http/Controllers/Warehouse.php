@@ -26,10 +26,16 @@ class Warehouse extends Controller
         $leverancier = $this->warehouseModel->GetLeverancierByProductId($id);
         $product = $this->warehouseModel->GetProductLeveringGegevens($id);
         
+        $productOverview = $this->warehouseModel->GetProductMagazijnOverzicht();
+        $currentProduct = collect($productOverview)->firstWhere('Id', $id);
+        $hasStock = $currentProduct && $currentProduct->AantalAanwezig !== null;
+        
         return view('leverancier.show', [
-            'title' => 'Leverancier Details',
+            'title' => 'Levering Informatie',
             'product' => $product,
-            'leverancier' => $leverancier
+            'leverancier' => $leverancier,
+            'hasStock' => $hasStock,
+            'productName' => $currentProduct->Naam ?? 'Onbekend product'
         ]);
     }
 }
