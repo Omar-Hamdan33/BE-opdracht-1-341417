@@ -10,5 +10,8 @@ class WarehouseModel extends Model
         return DB::select('CALL GetProductMagazijnOverzicht()');
     }
 
-
+    public function GetLeverancierByProductId($id)
+    {
+        return DB::select('CALL GetLeverancierByProduct(?)', [$id]);
+    }
 }
