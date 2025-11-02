@@ -201,8 +201,8 @@ BEGIN
            m.VerpakkingsEenheid) AS VerpakkingsEenheid,
         m.AantalAanwezig,
         p.IsActief,
-        p.DatumAangemaakt,
-        p.DatumGewijzigd
+        DATE_FORMAT(p.DatumAangemaakt, '%d/%m/%Y') AS DatumAangemaakt,
+        DATE_FORMAT(p.DatumGewijzigd, '%d/%m/%Y') AS DatumGewijzigd
     FROM Product p
 	JOIN Magazijn m ON p.Id = m.ProductId
     WHERE p.IsActief = 1
@@ -261,7 +261,7 @@ BEGIN
         l.ContactPersoon,
         l.LeverancierNummer,
         l.Mobiel,
-        l.DatumAangemaakt
+        DATE_FORMAT(l.DatumAangemaakt, '%d/%m/%Y') AS DatumAangemaakt
     FROM Leverancier l
 	JOIN ProductPerLeverancier ppl ON l.Id = ppl.LeverancierId
     WHERE ppl.ProductId = productId;
@@ -272,9 +272,9 @@ BEGIN
     SELECT 
         p.Id,
         p.Naam,
-        ppl.DatumLevering,
+        DATE_FORMAT(ppl.DatumLevering, '%d/%m/%Y') AS DatumLevering,
         ppl.Aantal,
-        ppl.DatumEerstVolgendeLevering
+        DATE_FORMAT(ppl.DatumEerstVolgendeLevering, '%d/%m/%Y') AS DatumEerstVolgendeLevering
     FROM Product p
 	JOIN ProductPerLeverancier ppl ON p.Id = ppl.ProductId
     WHERE ppl.ProductId = productId
