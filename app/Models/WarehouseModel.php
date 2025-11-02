@@ -12,6 +12,11 @@ class WarehouseModel extends Model
 
     public function GetLeverancierByProductId($id)
     {
-        return DB::select('CALL GetLeverancierByProduct(?)', [$id]);
+        return DB::selectOne('CALL GetLeverancierByProduct(?)', [$id]);
+    }
+
+    public function GetProductLeveringGegevens($id)
+    {
+        return DB::select('CALL GetProductLeveringGegevens(?)', [$id]);
     }
 }
