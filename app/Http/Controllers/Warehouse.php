@@ -38,4 +38,15 @@ class Warehouse extends Controller
             'productName' => $currentProduct->Naam ?? 'Onbekend product'
         ]);
     }
+
+    public function alergeen($id) {
+        $product = $this->warehouseModel->GetProductInfoById($id);
+        $allergenen = $this->warehouseModel->GetAllergeenByProductId($id);
+        
+        return view('alergeen.show', [
+            'title' => 'Product Details',
+            'product' => $product,
+            'allergenen' => $allergenen
+        ]);
+    }
 }
