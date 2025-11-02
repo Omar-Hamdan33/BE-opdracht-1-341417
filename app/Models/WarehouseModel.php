@@ -10,13 +10,5 @@ class WarehouseModel extends Model
         return DB::select('CALL GetProductMagazijnOverzicht()');
     }
 
-    public function GetProductAllergeenById($id)
-    {
-        return DB::select('CALL GetProductAllergeenInfo(?)', [$id]);
-    }
 
-    public function GetLeverancierByProductId($id)
-    {
-        return DB::select('CALL GetLeverancierByProduct(?)', [$id]);
-    }
 }

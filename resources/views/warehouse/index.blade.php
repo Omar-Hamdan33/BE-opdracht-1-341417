@@ -17,8 +17,8 @@
                 <th>Naam</th>
                 <th>VerpakkingsEenheid</th>
                 <th>Location</th>
+                <th>Leverantie info</th>
                 <th>Alergeen info</th>
-                <th>leverancier info</th>
             </tr>
         </thead>
         <tbody>
@@ -28,8 +28,8 @@
                     <td>{{ $item->Naam }}</td>
                     <td>{{ $item->VerpakkingsEenheid }}</td>
                     <td>{{ $item->AantalAanwezig }}</td>
-                    <td><a href="/alergeen/{{ $item->Id }}" class="bi bi-question-lg"></a></td>
-                    <td><a href="/leverancier/{{ $item->Id }}" class="bi bi-x-lg"></a></td>
+                    <td><a href="/leverancier/{{ $item->Id }}" class="bi bi-question-lg"></a></td>
+                    <td><a href="/alergeen/{{ $item->Id }}" class="bi bi-x-lg"></a></td>
                 </tr>
             @endforeach
         </tbody>
