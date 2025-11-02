@@ -212,20 +212,23 @@ CALL GetProductMagazijnOverzicht();
 
 
 DROP PROCEDURE IF EXISTS GetProductAllergeenInfo;
+DROP PROCEDURE IF EXISTS GetProductInfoById;
+DROP PROCEDURE IF EXISTS GetAllergeenByProductId;
 
 DELIMITER $$
 
-CREATE PROCEDURE GetProductAllergeenInfo(IN productId INT)
+CREATE PROCEDURE GetProductInfoById(IN productId INT)
 BEGIN
-    DECLARE product_count INT DEFAULT 0;
-    
     SELECT 
         p.Id,
         p.Naam,
         p.Barcode
     FROM Product p
     WHERE p.Id = productId;
-    
+END$$
+
+CREATE PROCEDURE GetAllergeenByProductId(IN productId INT)
+BEGIN
     SELECT 
         a.Id,
         a.Naam,
@@ -238,9 +241,11 @@ BEGIN
     AND a.IsActief = 1
     ORDER BY a.Naam ASC;
 END$$
+
 DELIMITER ;
 
-CALL GetProductAllergeenInfo(1);
+CALL GetProductInfoById(1);
+CALL GetAllergeenByProductId(1);
 
 DROP PROCEDURE IF EXISTS GetLeverancierByProduct;
 
