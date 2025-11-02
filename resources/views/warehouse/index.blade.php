@@ -14,21 +14,21 @@
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th>Barcode</th>
-                    <th>Naam</th>
-                    <th>VerpakkingsEenheid</th>
-                    <th>AantalAanwezig</th>
-                    <th>Allergenen Info</th>
-                    <th>Leverantie Info</th>
+                    <th class="text-center">Barcode</th>
+                    <th class="text-center">Naam</th>
+                    <th class="text-center">VerpakkingsEenheid</th>
+                    <th class="text-center">AantalAanwezig</th>
+                    <th class="text-center">Allergenen Info</th>
+                    <th class="text-center">Leverantie Info</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($data as $item)
                     <tr>
-                        <td>{{ $item->Barcode }}</td>
-                        <td>{{ $item->Naam }}</td>
-                        <td>{{ $item->VerpakkingsEenheid }}</td>
-                        <td>{{ $item->AantalAanwezig }}</td>
+                        <td class="text-center">{{ $item->Barcode }}</td>
+                        <td class="text-center">{{ $item->Naam }}</td>
+                        <td class="text-center">{{ $item->VerpakkingsEenheid }}</td>
+                        <td class="text-center">{{ $item->AantalAanwezig }}</td>
                         <td class="text-center">
                             <a href="/alergeen/{{ $item->Id }}" class="bi bi-x-lg text-danger" style="font-size: 1.2em; text-decoration: none;"></a>
                         </td>
