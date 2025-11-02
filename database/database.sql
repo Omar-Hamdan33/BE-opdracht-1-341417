@@ -243,6 +243,7 @@ DELIMITER ;
 CALL GetProductAllergeenInfo(1);
 
 DROP PROCEDURE IF EXISTS GetLeverancierByProduct;
+DROP PROCEDURE IF EXISTS GetProductLeveringGegevens;
 
 DELIMITER $$
 CREATE PROCEDURE GetLeverancierByProduct(IN productId INT)
@@ -257,7 +258,10 @@ BEGIN
     FROM Leverancier l
 	JOIN ProductPerLeverancier ppl ON l.Id = ppl.LeverancierId
     WHERE ppl.ProductId = productId;
-    
+END$$
+
+CREATE PROCEDURE GetProductLeveringGegevens(IN productId INT)
+BEGIN
     SELECT 
         p.Id,
         p.Naam,
@@ -266,13 +270,10 @@ BEGIN
         ppl.DatumEerstVolgendeLevering
     FROM Product p
 	JOIN ProductPerLeverancier ppl ON p.Id = ppl.ProductId
-    WHERE ppl.LeverancierId = (
-        SELECT DISTINCT l.Id
-        FROM Leverancier l
-		JOIN ProductPerLeverancier ppl2 ON l.Id = ppl2.LeverancierId
-        WHERE ppl2.ProductId = productId
-    );
+    WHERE ppl.ProductId = productId;
 END$$
 
 DELIMITER ;
+
 CALL GetLeverancierByProduct(1);
+CALL GetProductLeveringGegevens(1);
