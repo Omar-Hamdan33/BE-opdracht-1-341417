@@ -22,5 +22,16 @@ class Warehouse extends Controller
         ]);
     }
 
-
+    public function alergeen($id) {
+        $rawData = $this->warehouseModel->GetProductAllergeenById($id);
+        
+        $product = $rawData[0] ?? null;
+        $allergenen = array_slice($rawData, 1);
+        
+        return view('alergeen.show', [
+            'title' => 'Product Details',
+            'product' => $product,
+            'allergenen' => $allergenen
+        ]);
+    }
 }
