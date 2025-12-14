@@ -34,4 +34,23 @@ class WarehouseModel extends Model
     {
         return DB::select('CALL GetAllergeenByProductId(?)', [$id]);
     }
+
+    public function GetLeveranciersOverzicht()
+    {
+        return DB::select('CALL GetLeveranciersOverzicht()');
+    }
+
+    public function GetGeleverdeProductenByLeverancierId($id)
+    {
+        return DB::select('CALL GetGeleverdeProductenByLeverancierId(?)', [$id]);
+    }
+
+    public function AddProductLevering($leverancierId, $productId, $aantal, $datumEerstVolgendeLevering)
+    {
+        $result = DB::select('CALL AddProductLevering(?, ?, ?, ?, @resultMessage, @success)', 
+            [$leverancierId, $productId, $aantal, $datumEerstVolgendeLevering]);
+        
+        $outputs = DB::select('SELECT @resultMessage as resultMessage, @success as success');
+        return $outputs[0] ?? null;
+    }
 }

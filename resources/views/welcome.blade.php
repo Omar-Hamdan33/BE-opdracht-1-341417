@@ -13,12 +13,22 @@
                 <h1 class="mb-4">Welkom bij Jamin Magazijn Systeem</h1>
                 <p class="lead mb-4">Beheer uw magazijn en bekijk product informatie</p>
                 
-                <div class="card">
+                <div class="card mb-3">
                     <div class="card-body">
                         <h5 class="card-title">Magazijn Overzicht</h5>
                         <p class="card-text">Bekijk alle producten in het magazijn, inclusief voorraad, allergenen en leverancier informatie.</p>
                         <a href="/warehouse" class="btn btn-primary btn-lg">
                             Ga naar Overzicht Magazijn Jamin
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Overzicht leveranciers</h5>
+                        <p class="card-text">Bekijk alle leveranciers en hun geleverde producten aan Jamin.</p>
+                        <a href="/leveranciers" class="btn btn-success btn-lg">
+                            Ga naar Overzicht Leveranciers
                         </a>
                     </div>
                 </div>

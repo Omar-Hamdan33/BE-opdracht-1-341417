@@ -109,20 +109,20 @@ CREATE TABLE ProductPerLeverancier (
 ) ENGINE=InnoDB;
 
 
-INSERT INTO Product (Id, Naam, Barcode) VALUES
-(1, 'Mintnopjes', '8719587231278'),
-(2, 'Schoolkrijt', '8719587326713'),
-(3, 'Honingdrop', '8719587327836'),
-(4, 'Zure Beren', '8719587321441'),
-(5, 'Cola Flesjes', '8719587321237'),
-(6, 'Turtles', '8719587322245'),
-(7, 'Witte Muizen', '8719587328256'),
-(8, 'Reuzen Slangen', '8719587325641'),
-(9, 'Zoute Rijen', '8719587322739'),
-(10, 'Winegums', '8719587327527'),
-(11, 'Drop Munten', '8719587322345'),
-(12, 'Kruis Drop', '8719587322265'),
-(13, 'Zoute Ruitjes', '8719587323256');
+INSERT INTO Product (Id, Naam, Barcode, IsActief) VALUES
+(1, 'Mintnopjes', '8719587231278', 1),
+(2, 'Schoolkrijt', '8719587326713', 1),
+(3, 'Honingdrop', '8719587327836', 1),
+(4, 'Zure Beren', '8719587321441', 1),
+(5, 'Cola Flesjes', '8719587321237', 1),
+(6, 'Turtles', '8719587322245', 1),
+(7, 'Witte Muizen', '8719587328256', 1),
+(8, 'Reuzen Slangen', '8719587325641', 1),
+(9, 'Zoute Rijen', '8719587322739', 1),
+(10, 'Winegums', '8719587327527', 0),
+(11, 'Drop Munten', '8719587322345', 1),
+(12, 'Kruis Drop', '8719587322265', 1),
+(13, 'Zoute Ruitjes', '8719587323256', 1);
 
 INSERT INTO Magazijn (Id, ProductId, VerpakkingsEenheid, AantalAanwezig) VALUES
 (1, 1, 5.00, 453),
@@ -165,7 +165,8 @@ INSERT INTO Leverancier (Id, Naam, ContactPersoon, LeverancierNummer, Mobiel) VA
 (2, 'Astra Sweets', 'Jasper del Monte', 'L1029284315', '06-39398734'),
 (3, 'Haribo', 'Sven Stalman', 'L1029324748', '06-24383291'),
 (4, 'Basset', 'Joyce Stelterberg', 'L1023845773', '06-48293823'),
-(5, 'De Bron', 'Remco Veenstra', 'L1023857736', '06-34291234');
+(5, 'De Bron', 'Remco Veenstra', 'L1023857736', '06-34291234'),
+(6, 'Quality Street', 'Johan Nooij', 'L1029234586', '06-23458456');
 
 INSERT INTO ProductPerLeverancier (Id, LeverancierId, ProductId, DatumLevering, Aantal, DatumEerstVolgendeLevering) VALUES
 (1, 1, 1, '2024-10-09', 23, '2024-10-16'),
@@ -285,3 +286,97 @@ DELIMITER ;
 
 CALL GetLeverancierByProduct(1);
 CALL GetProductLeveringGegevens(1);
+
+DROP PROCEDURE IF EXISTS GetLeveranciersOverzicht;
+
+DELIMITER $$
+CREATE PROCEDURE GetLeveranciersOverzicht()
+BEGIN
+    SELECT 
+        l.Id,
+        l.Naam,
+        l.ContactPersoon,
+        l.LeverancierNummer,
+        l.Mobiel,
+        COALESCE(COUNT(DISTINCT CASE WHEN p.IsActief = 1 THEN p.Id END), 0) AS AantalVerschillendeProducten,
+        DATE_FORMAT(l.DatumAangemaakt, '%d/%m/%Y') AS DatumAangemaakt
+    FROM Leverancier l
+    LEFT JOIN ProductPerLeverancier ppl ON l.Id = ppl.LeverancierId AND ppl.IsActief = 1
+    LEFT JOIN Product p ON ppl.ProductId = p.Id
+    WHERE l.IsActief = 1
+    GROUP BY l.Id, l.Naam, l.ContactPersoon, l.LeverancierNummer, l.Mobiel, l.DatumAangemaakt
+    ORDER BY AantalVerschillendeProducten DESC, l.Naam ASC;
+END$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS GetGeleverdeProductenByLeverancierId;
+
+DELIMITER $$
+CREATE PROCEDURE GetGeleverdeProductenByLeverancierId(IN leverancierId INT)
+BEGIN
+    SELECT 
+        p.Id,
+        p.Naam,
+        p.Barcode,
+        COALESCE(m.AantalAanwezig, 0) AS AantalInMagazijn,
+        COALESCE(MAX(ppl.DatumLevering), 'Nooit') AS LaatsteLevering,
+        DATE_FORMAT(MAX(ppl.DatumEerstVolgendeLevering), '%d/%m/%Y') AS EerstVolgendeLevering
+    FROM Product p
+    INNER JOIN ProductPerLeverancier ppl ON p.Id = ppl.ProductId
+    LEFT JOIN Magazijn m ON p.Id = m.ProductId AND m.IsActief = 1
+    WHERE ppl.LeverancierId = leverancierId 
+    AND ppl.IsActief = 1
+    GROUP BY p.Id, p.Naam, p.Barcode, m.AantalAanwezig
+    ORDER BY COALESCE(m.AantalAanwezig, 0) DESC, p.Naam ASC;
+END$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS AddProductLevering;
+
+DELIMITER $$
+CREATE PROCEDURE AddProductLevering(
+    IN leverancierId INT, 
+    IN productId INT, 
+    IN aantal INT, 
+    IN datumEerstVolgendeLevering DATE,
+    OUT resultMessage VARCHAR(255),
+    OUT success BOOLEAN
+)
+BEGIN
+    DECLARE productActief BIT DEFAULT 0;
+    DECLARE leverancierNaam VARCHAR(100);
+    DECLARE productNaam VARCHAR(100);
+    DECLARE huidigAantal INT DEFAULT 0;
+    
+    SELECT IsActief, Naam INTO productActief, productNaam
+    FROM Product 
+    WHERE Id = productId
+    LIMIT 1;
+    
+    SELECT Naam INTO leverancierNaam
+    FROM Leverancier 
+    WHERE Id = leverancierId
+    LIMIT 1;
+    
+    IF productActief = 0 THEN
+        SET resultMessage = CONCAT('Het product ', COALESCE(productNaam, 'Onbekend'), ' van de leverancier ', COALESCE(leverancierNaam, 'Onbekend'), ' wordt niet meer geproduceerd');
+        SET success = FALSE;
+    ELSE
+        SELECT COALESCE(AantalAanwezig, 0) INTO huidigAantal 
+        FROM Magazijn 
+        WHERE ProductId = productId AND IsActief = 1
+        LIMIT 1;
+        
+        INSERT INTO ProductPerLeverancier (LeverancierId, ProductId, DatumLevering, Aantal, DatumEerstVolgendeLevering) 
+        VALUES (leverancierId, productId, CURDATE(), aantal, datumEerstVolgendeLevering);
+        
+        UPDATE Magazijn 
+        SET AantalAanwezig = COALESCE(AantalAanwezig, 0) + aantal,
+            DatumGewijzigd = NOW(6)
+        WHERE ProductId = productId AND IsActief = 1;
+        
+        SET resultMessage = 'Levering succesvol toegevoegd';
+        SET success = TRUE;
+    END IF;
+END$$
+DELIMITER ;
